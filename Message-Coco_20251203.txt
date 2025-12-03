@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>给Coco的一段心声</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 40px 25px;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(255,120,160,0.22), transparent 60%),
+      radial-gradient(circle at 80% 110%, rgba(255,165,195,0.18), transparent 65%),
+      #0b0b0b;
+    color: #ffffff;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.55) 100%);
+    z-index: 1;
+  }
+
+  h1 {
+    font-weight: 300;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    z-index: 3;
+  }
+
+  .typewriter {
+    font-size: 1.42rem;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    min-height: 210px;
+    width: 100%;
+    max-width: 650px;
+    opacity: 0;
+    animation: fadeIn 1.2s ease forwards;
+    z-index: 3;
+    text-shadow: 0 0 12px rgba(255,180,200,0.2);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: white;
+    padding: 14px 34px;
+    cursor: pointer;
+    font-size: 1.06rem;
+    border-radius: 10px;
+    transition: 0.35s;
+    margin-top: 28px;
+    backdrop-filter: blur(6px);
+    z-index: 3;
+  }
+
+  .btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+  }
+
+  footer {
+    margin-top: 60px;
+    font-size: 0.82rem;
+    opacity: 0.65;
+    z-index: 3;
+    text-shadow: 0 0 10px rgba(255,150,170,0.2);
+  }
+
+  .particle {
+    position: absolute;
+    top: -20px;
+    background: rgba(255,150,170,0.78);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(255,150,170,0.9);
+    animation: floatUp linear infinite;
+    opacity: 0.75;
+    z-index: 2;
+  }
+
+  @keyframes floatUp {
+    from { transform: translateY(0) scale(1); opacity: 0.85; }
+    to { transform: translateY(-120vh) scale(1.7); opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+
+<audio id="bgm" src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/A_A_Aalto/Little_Pieces/A_A_Aalto_-_03_-_Dreaming_of_Flying.mp3" loop preload="auto"></audio>
+
+<h1>给Coco的一段心声</h1>
+
+<div id="typewriter" class="typewriter"></div>
+
+<button class="btn" onclick="startChineseMessage()">播放讯息</button>
+
+<footer>这不是讯息，而是一份心意。</footer>
+
+<script>
+  const bgm = document.getElementById("bgm");
+  bgm.volume = 0.22;
+  document.addEventListener("click", () => {
+    if (bgm.paused) bgm.play();
+  }, { once: true });
+
+  function typeWriter(text, speed = 55) {
+    const el = document.getElementById("typewriter");
+    el.innerHTML = "";
+    let i = 0;
+
+    function typing() {
+      if (i < text.length) {
+        el.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typing, speed);
+      }
+    }
+
+    typing();
+  }
+
+  async function playVoice(text, lang = "zh-CN") {
+    const res = await fetch("https://YOUR_BACKEND_URL/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, lang })
+    });
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    const audio = new Audio(url);
+    audio.play();
+  }
+
+  function speakAndWriteChinese(text) {
+    typeWriter(text, 55);
+    playVoice(text, "zh-CN");
+  }
+
+  function startChineseMessage() {
+    const message =
+`亲爱的Coco，
+我想把这一段心里话，
+以一种更特别、也更温柔的方式告诉你。
+
+有些感受，用打字无法完全表达，
+用语音也不够贴近心里真正的声音。
+所以我想把声音和文字结合起来，
+让你一字一句、慢慢地听见。
+
+在忙碌的日子里，Coco,
+我依然会想着你，
+想着有机会，把这里的一点温度，
+轻轻地传到你那里。
+
+希望你喜欢这段讯息，
+也希望你能感受到，
+我是真心在意你的，Coco。I Love You`;
+
+    speakAndWriteChinese(message);
+  }
+
+  function createParticles() {
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement("div");
+      p.classList.add("particle");
+
+      const size = Math.random() * 7 + 5;
+      p.style.width = p.style.height = size + "px";
+
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.animationDuration = Math.random() * 10 + 12 + "s";
+      p.style.animationDelay = Math.random() * 6 + "s";
+
+      document.body.appendChild(p);
+    }
+  }
+
+  createParticles();
+</script>
+
+</body>
+</html>
