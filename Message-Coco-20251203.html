@@ -110,16 +110,38 @@
 
 <div id="typewriter" class="typewriter"></div>
 
-<button class="btn" onclick="startChineseMessage()">播放讯息</button>
+<button class="btn" onclick="startChineseMessage()" id="playButton">播放讯息</button>
 
 <footer>这不是讯息，而是一份心意。</footer>
 
+<!-- ============================================ -->
+<!--                  NEW SCRIPT                  -->
+<!-- ============================================ -->
+
 <script>
   const bgm = document.getElementById("bgm");
-  bgm.volume = 0.22;
-  document.addEventListener("click", () => {
-    if (bgm.paused) bgm.play();
-  }, { once: true });
+  bgm.volume = 0.20;
+
+  function fadeVolume(audio, target, duration = 600) {
+    const steps = 20;
+    const stepTime = duration / steps;
+    const diff = target - audio.volume;
+    const step = diff / steps;
+
+    let count = 0;
+    const timer = setInterval(() => {
+      audio.volume += step;
+      count++;
+      if (count >= steps) {
+        audio.volume = target;
+        clearInterval(timer);
+      }
+    }, stepTime);
+  }
+
+  function playBGM() {
+    bgm.play().catch(err => console.log("Autoplay blocked:", err));
+  }
 
   function typeWriter(text, speed = 55) {
     const el = document.getElementById("typewriter");
@@ -133,30 +155,35 @@
         setTimeout(typing, speed);
       }
     }
-
     typing();
   }
 
-  async function playVoice(text, lang = "zh-CN") {
-    const res = await fetch("https://YOUR_BACKEND_URL/tts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, lang })
-    });
-
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-
-    const audio = new Audio(url);
-    audio.play();
+  async function playVoice(text) {
+    // Placeholder until backend exists
+    console.warn("No TTS backend. Voice playback skipped.");
+    return new Audio();
   }
 
-  function speakAndWriteChinese(text) {
+  async function speakAndWriteChinese(text) {
     typeWriter(text, 55);
-    playVoice(text, "zh-CN");
+
+    fadeVolume(bgm, 0.05, 900);
+
+    const voice = await playVoice(text);
+
+    try { await voice.play(); }
+    catch (err) { console.log("Voice blocked:", err); }
+
+    voice.onended = () => {
+      fadeVolume(bgm, 0.20, 1200);
+    };
   }
 
   function startChineseMessage() {
+    document.getElementById("playButton").style.display = "none";
+
+    playBGM();
+
     const message =
 `亲爱的Coco，
 我想把这一段心里话，
