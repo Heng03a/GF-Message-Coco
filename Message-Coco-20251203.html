@@ -119,30 +119,15 @@
 <!-- ============================================ -->
 
 <script>
+  // Background music only
   const bgm = document.getElementById("bgm");
-  bgm.volume = 0.20;
+  bgm.volume = 0.22;
 
-  function fadeVolume(audio, target, duration = 600) {
-    const steps = 20;
-    const stepTime = duration / steps;
-    const diff = target - audio.volume;
-    const step = diff / steps;
+  document.addEventListener("click", () => {
+    if (bgm.paused) bgm.play();
+  }, { once: true });
 
-    let count = 0;
-    const timer = setInterval(() => {
-      audio.volume += step;
-      count++;
-      if (count >= steps) {
-        audio.volume = target;
-        clearInterval(timer);
-      }
-    }, stepTime);
-  }
-
-  function playBGM() {
-    bgm.play().catch(err => console.log("Autoplay blocked:", err));
-  }
-
+  // Typewriter effect only (NO VOICE)
   function typeWriter(text, speed = 55) {
     const el = document.getElementById("typewriter");
     el.innerHTML = "";
@@ -158,32 +143,8 @@
     typing();
   }
 
-  async function playVoice(text) {
-    // Placeholder until backend exists
-    console.warn("No TTS backend. Voice playback skipped.");
-    return new Audio();
-  }
-
-  async function speakAndWriteChinese(text) {
-    typeWriter(text, 55);
-
-    fadeVolume(bgm, 0.05, 900);
-
-    const voice = await playVoice(text);
-
-    try { await voice.play(); }
-    catch (err) { console.log("Voice blocked:", err); }
-
-    voice.onended = () => {
-      fadeVolume(bgm, 0.20, 1200);
-    };
-  }
-
+  // When button is clicked:
   function startChineseMessage() {
-    document.getElementById("playButton").style.display = "none";
-
-    playBGM();
-
     const message =
 `亲爱的Coco，
 我想把这一段心里话，
@@ -203,9 +164,10 @@
 也希望你能感受到，
 我是真心在意你的，Coco。I Love You`;
 
-    speakAndWriteChinese(message);
+    typeWriter(message);
   }
 
+  // Floating particles
   function createParticles() {
     for (let i = 0; i < 30; i++) {
       const p = document.createElement("div");
@@ -221,7 +183,6 @@
       document.body.appendChild(p);
     }
   }
-
   createParticles();
 </script>
 
